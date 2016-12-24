@@ -1,0 +1,120 @@
+<html>
+	<head>
+		<title>Text Reader</title>
+		<style>
+		body{
+			margin: 0;
+			padding: 0;
+		}
+		span{
+			border:1px solid grey;
+			padding:2px;
+			background: #eee;
+			font-family: arial;
+		}
+		</style>
+		<script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+		<script>
+			var isPlaying = false;
+			var presentWordIdx = 0;
+			var playTimeout = null;
+			var speed = ["1x", "2x", "4x"];
+			var selectedSpeed = 0;
+			var playSpeedTime = [450, 350, 250];
+			var words;
+
+			
+			function startPlay()
+			{
+				if (isPlaying) return;
+				console.log("StartPlay");
+				words = $("div").text().replace(/\s{2,}/g, ' ').split(" ");
+				isPlaying = true;
+				playTimeout = setTimeout("playExecution()", playSpeedTime[selectedSpeed]);
+			}
+
+			function pausePlay()
+			{
+				console.log("PausePlay");
+				if (!isPlaying) return;
+				// if (!playTimeout) clearTimeout(playTimeout);
+				isPlaying = false;
+				// $("span").html("");
+			}
+
+			function stopPlay()
+			{
+				console.log("StopPlay");
+				if (!isPlaying) return;
+				// if (!playTimeout) clearTimeout(playTimeout);
+				playTimeout = null;
+				presentWordIdx = 0;
+				isPlaying = false;
+				$("span").html("");
+			}
+
+			function playExecution()
+			{
+				if (!isPlaying) return;
+				presentWord = words[presentWordIdx];
+				//Delays to be added 
+				var exclamationChar = (presentWord.indexOf("!")>=0); //100% additional
+				var fullStopChar = (presentWord.indexOf(".")>=0); //100% additional
+				var commaChar = (presentWord.indexOf(",")>=0); //50% additional
+				var semiColonChar = (presentWord.indexOf(";")>=0); //30% additional 
+				//Small word should be clubbed to the next 
+				if (presentWord.length<=5&&!fullStopChar&&!commaChar&&!semiColonChar&&!exclamationChar) 
+				{
+					presentWordIdx++;
+					presentWord = presentWord + " " + words[presentWordIdx];
+				}
+				$("span").html(presentWord);
+				
+				presentWordIdx++;
+				if (presentWordIdx>=words.length) 
+					stopPlay();
+				else 
+					playTimeout = setTimeout("playExecution()", (1+1*fullStopChar+1*exclamationChar+0.5*commaChar+0.3*semiColonChar) * playSpeedTime[selectedSpeed]);
+			}
+
+			function changeSpeed(i)
+			{
+				console.log(speed[i]);
+				selectedSpeed = i;
+			}
+
+
+
+			// $(document).ready(function(){
+			// 	console.log($("p").html());
+			// });
+		</script>
+		
+	</head>
+	<body>
+		<div>Lorem Ipsum is simply dummy text of the <b>Hello</b> printing and typesetting industry. <p> </p> Lorem Ipsum has been the industry's <img src=""></img>standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.<img src=""></img></div>
+		<span></span>
+		<br>
+		<br>
+		<button onClick="startPlay()">Play</button>
+		<button onClick="pausePlay()">Pause</button>
+		<button onClick="stopPlay()">Stop</button>
+		<br>
+		<br>
+		<button onClick="changeSpeed(0)">1x</button>
+		<button onClick="changeSpeed(1)">2x</button>
+		<button onClick="changeSpeed(2)">4x</button>
+		<!--
+		0. Internal tags to be avoided 
+		0. Mark the word in the 
+		1. UI/UX - buttons 
+		2. Keyboard shortcuts - pause - rewind - forward 
+		3. Restrictions 
+		4. Pluginify 
+		5. Theater version 
+		6. Word placement 
+		7. Word timing 
+		8. Cookie with speed preference 
+	-->
+	</body>
+</html>
